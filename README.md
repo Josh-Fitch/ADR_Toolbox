@@ -8,11 +8,12 @@ Toolbox of capabilities for the early-stage design and analysis of Active Debris
 
 ## Installation
 - Git clone this repository to your local machine
-- Install my-project with pip
+- Install the repo as a library using pip
 ```bash
   pip install -e [adr_toolbox CLONE FILE PATH]
 ```
 - The use of -e will ensure updates to the adr_toolbox repo are reflected in the library usage
+- It is recommended to use a virtual environment like venv or Anaconda to manage dependencies
 
 ## Requirements
 * numpy
