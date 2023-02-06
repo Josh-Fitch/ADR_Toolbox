@@ -1,5 +1,20 @@
 # adr_toolbox
-Library providing capabilities for the early-stage design and analysis of Active Debris Removal missions, systems, and system-of-system architectures.
+Toolbox of capabilities for the early-stage design and analysis of Active Debris Removal missions, systems, and SoS architectures.
+
+## Authors
+- Joshua Fitch 
+- - https://github.itap.purdue.edu/fitchj / https://github.com/Josh-Fitch
+- Email: jfitch007@outlook.com
+- Developed as a part of Purdue AAE MS Thesis (<INSERT LINK TO THESIS>)
+
+## Installation
+Install my-project with pip
+```bash
+  pip install adr_toolbox
+```
+
+## Requirements
+* numpy
 
 ## Subpackages
 ### Data Acquisition
