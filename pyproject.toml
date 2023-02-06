@@ -1,6 +1,6 @@
 [project]
 name = "adr_toolbox"
-version = "0.0.0"
+version = "0.0.1"
 description = "Toolbox for analysis and design of Active Debris Removal systems, missions, and SoS architectures"
 authors = [
     {name = "Joshua David Fitch", email = "jfitch007@outlook.com"},
