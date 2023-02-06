@@ -4,13 +4,15 @@ Toolbox of capabilities for the early-stage design and analysis of Active Debris
 ## Authors
 - Joshua Fitch -- https://github.com/Josh-Fitch
 - Email: jfitch007@outlook.com
-- Developed as a part of Purdue AAE MS Thesis (<INSERT LINK TO THESIS>)
+- Developed as a part of Purdue AAE MS Thesis ([INSERT LINK TO THESIS])
 
 ## Installation
-Install my-project with pip
+- Git clone this repository to your local machine
+- Install my-project with pip
 ```bash
-  pip install adr_toolbox
+  pip install -e [adr_toolbox CLONE FILE PATH]
 ```
+- The use of -e will ensure updates to the adr_toolbox repo are reflected in the library usage
 
 ## Requirements
 * numpy
