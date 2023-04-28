@@ -105,8 +105,8 @@ class Sat():
             if self.prop_status == 0:
                 # Add poliastro orbit object to list
                 self.orbits.append(Orbit.from_vectors(Earth, pos << u.km, vel << u.km / u.s))
-            elif self.prop_status == 1:
-                # Often, eccentricity errors are due to low-altitude
+            else:
+                # Often, propagation errors are due to low-altitude
                 if (sat.am - 1) * sat.radiusearthkm < 400: # pylint: disable=E1101:no-member
                     # If altitude <400 km, will deorbit in ~1 year, not a concern
                     self.prop_status = 6
