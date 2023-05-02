@@ -70,16 +70,17 @@ class Mission():
         self.sim_step_size = sim_step_size
         self.no_route = no_route
         self.vehicle_used = []
+        self.vehicle_mass = 0
+        self.max_veh_mass = 0
+        for servicer in servicers:
+            self.max_veh_mass += servicer.wet_mass
+            if isinstance(servicer, Mothership):
+                self.max_veh_mass += servicer.modules[0].wet_mass * len(servicer.modules)
 
         # Setup an attribute to score optimization behavior
         self.ga_evo = {}
         self.best_route = None
-
-        self.raw_metrics = {
-            "risk remediated": 0,
-            "total tof": 0,
-            "max tof": 0
-        }
+        self.raw_metrics = {}
 
 
     def solve_mission(self):
@@ -87,9 +88,9 @@ class Mission():
         # Instantiate the optimizer object
         routing = VehicleRouting(
             self.__traverse_routes, len(self.targets), len(self.servicers),
-            num_gens=len(self.targets), pop_size=100 * len(self.targets),
-            weights=(1,), bit_mutate_prob=0.5, ind_mutate_prob=0.2,
-            cross_prob=0.3, tourney_size=10
+            num_gens=10, pop_size=100 + len(self.targets)**3,
+            weights=(1,), bit_mutate_prob=0.8, ind_mutate_prob=0.05,
+            cross_prob=0.8, tourney_size=20
         )
         # Solve the optimization problem
         routing.optimize()
@@ -129,8 +130,17 @@ class Mission():
         if self.no_route is False:
             for route in routes:
                 if len(route) == 0:
-                    return (0,)
+                    return (0.00001,)
         self.vehicle_used = np.zeros(len(self.servicers))
+        self.vehicle_mass = 0
+        available_refuels = 0
+        refuels_used = 0
+        self.raw_metrics = {
+            "risk remediated": 0,
+            "total tof": 0,
+            "max tof": 0,
+            "refuel mass": 0
+        }
 
         # Initiate/reset the data logging dictionary and target RAANs for each run
         self.__setup_log()
@@ -147,6 +157,7 @@ class Mission():
                 refuels = 0
             else:
                 refuels = servicer.num_refuels
+                available_refuels += servicer.num_refuels
             usable_prop = servicer.prop_mass
 
             vehicle_risk_reduction = 0
@@ -372,7 +383,7 @@ class Mission():
             vehicle_tof_years = vehicle_tof / 3600 / 24 / 365
 
             # Capture all non-dimensionalized vehicle scores
-            score_list.append(0.5 + (vehicle_risk_reduction / self.max_score / 2))
+            score_list.append(vehicle_risk_reduction)
             tof_list.append(1/(1+(vehicle_tof_years / self.year_limit)))
             if self.max_countries == 1:
                 policy_list.append(1)
@@ -383,14 +394,24 @@ class Mission():
             self.raw_metrics["total tof"] += vehicle_tof_years
             if vehicle_tof_years > self.raw_metrics["max tof"]:
                 self.raw_metrics["max tof"] = vehicle_tof_years
+            if not isinstance(servicer, Picker):
+                self.raw_metrics["refuel mass"] += (servicer.num_refuels - refuels) \
+                    * servicer.prop_mass
+                refuels_used += servicer.num_refuels - refuels
 
             if len(route) > 0:
                 self.vehicle_used[serv_ind] = 1
+                self.vehicle_mass += servicer.wet_mass
+                if isinstance(servicer, Mothership):
+                    self.vehicle_mass += servicer.modules[0].wet_mass * len(servicer.modules)
+
+        if self.raw_metrics["risk remediated"] == 0:
+            return (0.00001,)
 
         # Get final score metrics
-        risk_score = np.average(score_list)
+        risk_score = 0.5 + (sum(score_list) / self.max_score / 2)
         time_score = min(tof_list)
-        veh_score = 1/(1 + (sum(self.vehicle_used) / len(self.servicers)))
+        veh_score = 1/(1 + (self.vehicle_mass / self.max_veh_mass))
         policy_score = np.average(policy_list)
         alpha, beta, gamma, delta = self.weights
 

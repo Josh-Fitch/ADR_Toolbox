@@ -68,22 +68,19 @@ class VehicleRouting():
 
         # Initialize empty toolbox and population stats
         self.pop = None
+        self.hof = None
         self.best_ind = None
         self.best_performance = None
-
-        # Create problem and toolbox
-        toolbox = base.Toolbox()
-        self.toolbox = toolbox
-        self.logbook = tools.Logbook()
         self.stats = None
-
-        # Call general setup methods
-        self.__ga_setup()
-        self.__log_stats()
+        self.toolbox = None
+        self.logbook = None
 
 
     def optimize(self):
         """ Function to iterate through generations and perform optimization routine """
+        # Call general setup methods
+        self.__ga_setup()
+
         # Evaluate the entire population
         fitnesses = list(map(self.toolbox.evaluate, self.pop)) # pylint: disable=no-member
         for ind, fit in zip(self.pop, fitnesses):
@@ -96,8 +93,8 @@ class VehicleRouting():
         print("Routing Optimization Initialized")
         while True:
             if gen_iter > self.num_gens:
-                # Compute percent change in past 10 generations
-                perc_imp = abs(np.average(perfs[-10:-1]) - perfs[-1]) * 100 / perfs[-1]
+                # Compute percent change in past 5 generations
+                perc_imp = abs(np.average(perfs[-5:-1]) - perfs[-1]) * 100 / perfs[-1]
                 # Once convergence is less than 1% improvement, stop
                 if perc_imp < 1:
                     break
@@ -147,9 +144,15 @@ class VehicleRouting():
             perfs = np.append(perfs, record["avg"])
             self.logbook.record(gen=gen_iter, **record)
 
+        del creator.FitnessMax # pylint: disable=no-member
+        del creator.Individual # pylint: disable=no-member
+
 
     def __ga_setup(self):
         """ Private method to setup DEAP GA tools """
+        # Create problem and toolbox
+        self.toolbox = base.Toolbox()
+        self.logbook = tools.Logbook()
 
         # Initialize the problem with weights and max or min
         creator.create("FitnessMax", base.Fitness, weights=self.weights)
@@ -192,6 +195,7 @@ class VehicleRouting():
         pop = self.toolbox.population(n=self.pop_size) # pylint: disable=no-member
         self.pop = pop
         self.hof = tools.HallOfFame(1)
+        self.__log_stats()
 
 
     def __log_stats(self):

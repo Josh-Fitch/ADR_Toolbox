@@ -22,8 +22,8 @@ servicer_3 = Picker("Picker", 500, 0.4, 100e-3, 1400, 1, 0,
 
 # Create a homogeneous fleet of 3 servicing vehicles
 servicers = [servicer_1, servicer_2, servicer_3]
-mission = Mission(targets, servicers, (0.5, 0, 0.5, 0), 4, 1, 10, 600, no_route=True)
+mission = Mission(targets, servicers, [0.8, 0.2, 0, 0], 5, 0, 10, 600, no_route=True)
 
 # Solve the routing and save to a .dat file
 mission.solve_mission()
-save_data(mission, "cluster3_fleet3_combo_05score_05num")
+save_data(mission, "cluster3_fleet3_combo_08score_02tof_0gamma_test")

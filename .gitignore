@@ -2,6 +2,9 @@
 auth.ini
 .vscode/
 
+# Large architecture files
+examples/sos_design/*.dat
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
